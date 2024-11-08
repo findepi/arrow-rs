@@ -749,8 +749,8 @@ impl<T: ArrowDictionaryKeyType> Array for DictionaryArray<T> {
         }
     }
 
-    fn is_nullable(&self) -> bool {
-        !self.is_empty() && (self.nulls().is_some() || self.values.is_nullable())
+    fn is_logically_nullable(&self) -> bool {
+        !self.is_empty() && (self.nulls().is_some() || self.values.is_logically_nullable())
     }
 
     fn get_buffer_memory_size(&self) -> usize {
@@ -866,8 +866,8 @@ impl<K: ArrowDictionaryKeyType, V: Sync> Array for TypedDictionaryArray<'_, K, V
         self.dictionary.logical_nulls()
     }
 
-    fn is_nullable(&self) -> bool {
-        self.dictionary.is_nullable()
+    fn is_logically_nullable(&self) -> bool {
+        self.dictionary.is_logically_nullable()
     }
 
     fn get_buffer_memory_size(&self) -> usize {

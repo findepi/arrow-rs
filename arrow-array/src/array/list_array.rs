@@ -493,6 +493,14 @@ impl<OffsetSize: OffsetSizeTrait> Array for GenericListArray<OffsetSize> {
         self.nulls.as_ref()
     }
 
+      fn logical_null_count(&self) -> usize {
+        self.null_count()
+    }
+
+    fn is_logically_nullable(&self) -> bool {
+        self.logical_null_count() > 0
+    }
+
     fn get_buffer_memory_size(&self) -> usize {
         let mut size = self.values.get_buffer_memory_size();
         size += self.value_offsets.inner().inner().capacity();

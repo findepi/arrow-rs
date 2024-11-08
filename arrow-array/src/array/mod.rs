@@ -314,10 +314,29 @@ pub trait Array: std::fmt::Debug + Send + Sync {
     /// are present. For example a [`DictionaryArray`] with nullable values will still return true,
     /// even if the nulls present in [`DictionaryArray::values`] are not referenced by any key,
     /// and therefore would not appear in [`Array::logical_nulls`].
+    // #[deprecated(
+    //     since = "53.0.0",
+    //     note = "This method is deprecated because it's default implementation was not always correct and the name could be more self-explanatory. Use `is_logically_nullable` instead."
+    // )]
     fn is_nullable(&self) -> bool {
-        // TODO this is not necessarily perfect default implementation, since null_count() and logical_null_count() are not always equivalent
+         // TODO this is not necessarily perfect default implementation, since null_count() and logical_null_count() are not always equivalent
         self.null_count() != 0
     }
+
+    /// Returns `false` if the array is guaranteed to contain no logical nulls
+    ///
+    /// This is generally equivalent to `Array::logical_null_count() != 0` unless determining
+    /// the logical nulls is expensive, in which case this method can return true even for an
+    /// array without nulls.
+    ///
+    /// This is also generally equivalent to `Array::null_count() != 0` but may differ in the
+    /// presence of logical nullability, see [`Array::logical_null_count`] and [`Array::null_count`].
+    ///
+    /// Implementations can return `true` unless they can cheaply prove no logical nulls
+    /// are present. For example a [`DictionaryArray`] with nullable values will still return true,
+    /// even if the nulls present in [`DictionaryArray::values`] are not referenced by any key,
+    /// and therefore would not appear in [`Array::logical_nulls`].
+    fn is_logically_nullable(&self) -> bool;
 
     /// Returns the total number of bytes of memory pointed to by this array.
     /// The buffers store bytes in the Arrow memory format, and include the data as well as the validity map.
@@ -396,6 +415,10 @@ impl Array for ArrayRef {
         self.as_ref().is_nullable()
     }
 
+    fn is_logically_nullable(&self) -> bool {
+        self.as_ref().is_logically_nullable()
+    }
+
     fn get_buffer_memory_size(&self) -> usize {
         self.as_ref().get_buffer_memory_size()
     }
@@ -464,6 +487,10 @@ impl<T: Array> Array for &T {
 
     fn is_nullable(&self) -> bool {
         T::is_nullable(self)
+    }
+
+    fn is_logically_nullable(&self) -> bool {
+        T::is_logically_nullable(self)
     }
 
     fn get_buffer_memory_size(&self) -> usize {

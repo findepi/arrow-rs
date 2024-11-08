@@ -371,8 +371,8 @@ impl<T: RunEndIndexType> Array for RunArray<T> {
         Some(out.finish().into())
     }
 
-    fn is_nullable(&self) -> bool {
-        !self.is_empty() && self.values.is_nullable()
+    fn is_logically_nullable(&self) -> bool {
+        !self.is_empty() && self.values.is_logically_nullable()
     }
 
     fn get_buffer_memory_size(&self) -> usize {
@@ -598,6 +598,10 @@ impl<R: RunEndIndexType, V: Sync> Array for TypedRunArray<'_, R, V> {
 
     fn is_nullable(&self) -> bool {
         self.run_array.is_nullable()
+    }
+
+    fn is_logically_nullable(&self) -> bool {
+        self.run_array.is_logically_nullable()
     }
 
     fn get_buffer_memory_size(&self) -> usize {

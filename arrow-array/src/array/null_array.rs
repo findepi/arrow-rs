@@ -117,7 +117,7 @@ impl Array for NullArray {
         (self.len != 0).then(|| NullBuffer::new_null(self.len))
     }
 
-    fn is_nullable(&self) -> bool {
+    fn is_logically_nullable(&self) -> bool {
         !self.is_empty()
     }
 

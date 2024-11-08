@@ -874,11 +874,11 @@ impl Array for UnionArray {
         }
     }
 
-    fn is_nullable(&self) -> bool {
+    fn is_logically_nullable(&self) -> bool {
         self.fields
             .iter()
             .flatten()
-            .any(|field| field.is_nullable())
+            .any(|field| field.is_logically_nullable())
     }
 
     fn get_buffer_memory_size(&self) -> usize {
